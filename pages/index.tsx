@@ -52,6 +52,10 @@ const Home: NextPage = () => {
 
   }, []);
 
+  const handleCopyClick = async () => {
+    await navigator.clipboard.writeText(peerId as string);
+  };
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { currentTarget: { value } } = e;
@@ -86,6 +90,7 @@ const Home: NextPage = () => {
           </div>
         </div>
 
+        <button onClick={handleCopyClick}>Id 복사</button>
         <button onClick={handleClick}>통화 연결하기</button>
         {audioStreams.map(stream => (
           <div key={stream.id}>
