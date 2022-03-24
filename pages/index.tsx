@@ -1,65 +1,55 @@
 import type { NextPage } from 'next'
+import { useEffect, useState, useRef } from 'react';
 
-import { initPeer } from 'utils/peer';
+import type Peer from 'peerjs'
 
-import { useEffect, useState } from 'react';
+import Audio from 'components/Audio';
 
-let peer;
-
-async function startCapture(displayMediaOptions) {
-  let captureStream = null;
+async function startCapture() {
+  let captureStream = undefined;
 
   try {
-    captureStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
-  } catch(err) {
+    captureStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
     console.error("Error: " + err);
   }
   return captureStream;
 }
 
 const Home: NextPage = () => {
-  const [isConnected, setIsConnected] = useState(false);
+  const peer = useRef<Peer>();
+  // const [isConnected, setIsConnected] = useState(false);
   const [peerId, setPeerId] = useState('');
   const [value, setValue] = useState('');
-  useEffect(() => {
-    const initTerminal = async () => {
-      const { default: Peer } = await import('peerjs')
-      console.log(Peer)
-      peer = initPeer(Peer);
-      peer.subscribeOpen(
-        (id: string) => {
-          setPeerId(id);
-        },
-      );
 
-      peer.subscribeDataReceive(({ key, payload }) => {
-        switch (key) {
-          case 'connected': {
-            const { id } = payload;
-            setIsConnected(true);
-            setValue(id);
-            break;
-          }
-        }
+
+  const [audioStreams, setAudioStreams] = useState<MediaStream[]>([]);
+
+  useEffect(() => {
+    const init = async () => {
+      const { default: Peer } = await import('peerjs');
+
+      peer.current = new Peer({
+        secure: true,
+        host: process.env.NEXT_PUBLIC_PEER_SERVER,
+        port: 443
       });
 
-      peer.peer.on('call', async (call) => {
-        console.log('call', call);
+      peer.current.on('open', (id: string) => {
+        console.log('open', id);
+        setPeerId(id);
+      });
 
-        const stream = await startCapture({ video: true });
+      peer.current.on('call', async (call) => {
+        const stream = await startCapture();
         call.answer(stream);
-
-        call.on('stream', (remoteStream: any) => {
-          // Show stream in some video/canvas element.
-          const video = document.getElementById('peer');
-          video.srcObject = remoteStream;
-          video.play();
-
+        call.on('stream', (remoteStream) => {
+          setAudioStreams(v => ([...v, remoteStream]));
         });
       });
     }
-    initTerminal()
-    
+    init()
+
   }, []);
 
 
@@ -68,28 +58,21 @@ const Home: NextPage = () => {
     setValue(value);
   }
 
-  const handleButtonClick = () => {
-    peer.connect(value);
-    setIsConnected(true);
-  }
-
   const handleClick = async () => {
+    const stream = await startCapture();
 
-    const stream = await startCapture({ video: true, audio: true });
-    console.log(stream)
+    if (!peer.current || !stream) {
+      return;
+    }
 
-      var call = peer.peer.call(value, stream);
-      call.on('stream', function(remoteStream) {
-        const video = document.getElementById('peer');
-        video.srcObject = remoteStream;
-        video.play()
-        // Show stream in some video/canvas element.
-      });
-;
+    const call = peer.current.call(value, stream);
+    call.on('stream', (remoteStream) => {
+      setAudioStreams(v => ([...v, remoteStream]));
+    });
   };
   return (
-<div className="container is-flex is-flex-direction-column">
-      <section className="section is-flex is-flex-direction-column">
+    <div>
+      <section>
         <div className="field">
           <label className="label">My ID</label>
           <div className="control">
@@ -102,14 +85,17 @@ const Home: NextPage = () => {
             <input className="input" onChange={handleChange} value={value} />
           </div>
         </div>
-        <button className="button is-primary" onClick={handleButtonClick} disabled={isConnected}>
-          {isConnected ? '연결 중' : '연결'}
-        </button>
-        <button onClick={handleClick}>비디오</button>
+
+        <button onClick={handleClick}>통화 연결하기</button>
+        {audioStreams.map(stream => (
+          <div key={stream.id}>
+            {stream.id}
+            <Audio key={stream.id} stream={stream} />
+          </div>
+        ))}
       </section>
-      <video id="peer" />
     </div>
   );
-  
+
 }
 export default Home
