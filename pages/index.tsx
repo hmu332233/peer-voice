@@ -90,8 +90,8 @@ const Home: NextPage = () => {
           </div>
         </div>
 
-        <button onClick={handleCopyClick}>Id 복사</button>
-        <button onClick={handleClick}>통화 연결하기</button>
+        <button className="btn" onClick={handleCopyClick}>Id 복사</button>
+        <button className="btn" onClick={handleClick}>통화 연결하기</button>
         {audioStreams.map(stream => (
           <div key={stream.id}>
             {stream.id}
