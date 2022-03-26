@@ -1,10 +1,13 @@
 module.exports = {
-  content: [
-    './pages/**/*.{js,ts,jsx,tsx}',
-    './components/**/*.{js,ts,jsx,tsx}',
-  ],
+  corePlugins: {
+    container: false,
+  },
+  content: ['./pages/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {},
   },
   plugins: [require('daisyui')],
+  daisyui: {
+    themes: ['emerald'],
+  },
 };
