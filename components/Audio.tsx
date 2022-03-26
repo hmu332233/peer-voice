@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 type Props = {
-  stream: MediaStream,
+  stream: MediaStream;
 };
 
 function Audio({ stream }: Props) {
@@ -16,10 +16,7 @@ function Audio({ stream }: Props) {
     ref.current.play();
   }, [stream]);
 
-  return (
-    <audio ref={ref} />
-  );
-};
-
+  return <audio ref={ref} />;
+}
 
 export default Audio;
