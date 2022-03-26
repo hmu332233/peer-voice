@@ -13,7 +13,7 @@ function Header({}: Props) {
           </a>
         </Link>
       </h1>
-      <p className="py-4">웹페이지에서 상대방과 간단하게 통화해보세요!</p>
+      <p className="py-4">웹페이지에서 친구와 간단하게 통화해보세요!</p>
     </header>
   );
 }

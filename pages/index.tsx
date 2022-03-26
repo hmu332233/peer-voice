@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import type Peer from 'peerjs';
 
 import Audio from 'components/Audio';
+import Avatar from 'components/Avatar';
 
 async function startCapture() {
   let captureStream = undefined;
@@ -52,6 +53,7 @@ const Home: NextPage = () => {
 
   const handleCopyClick = async () => {
     await navigator.clipboard.writeText(peerId as string);
+    alert('복사되었습니다!\n친구에게 ID를 알려주세요.');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,34 +76,45 @@ const Home: NextPage = () => {
     });
   };
   return (
-    <div>
-      <section>
-        <div className="field">
-          <label className="label">My ID</label>
-          <div className="control">
-            <input className="input" value={peerId} disabled />
-          </div>
-        </div>
-        <div className="field">
-          <label className="label">Peer ID</label>
-          <div className="control">
-            <input className="input" onChange={handleChange} value={value} />
-          </div>
-        </div>
-
-        <button className="btn" onClick={handleCopyClick}>
-          Id 복사
-        </button>
-        <button className="btn" onClick={handleClick}>
-          통화 연결하기
-        </button>
+    <div className="flex flex-col items-center gap-y-4">
+      <div className="form-control w-full max-w-xs">
+        <label className="label">
+          <span className="label-text">내 ID</span>
+        </label>
+        <input
+          type="text"
+          placeholder="Type here"
+          className="input input-bordered w-full max-w-xs"
+          value={peerId}
+          disabled
+        />
+      </div>
+      <div className="form-control w-full max-w-xs">
+        <label className="label">
+          <span className="label-text">친구 ID</span>
+        </label>
+        <input
+          type="text"
+          placeholder="Type here"
+          className="input input-bordered w-full max-w-xs"
+          onChange={handleChange}
+          value={value}
+        />
+      </div>
+      <button className="btn btn-wide" onClick={handleCopyClick}>
+        내 ID 복사
+      </button>
+      <button className="btn btn-wide" onClick={handleClick}>
+        통화 연결하기
+      </button>
+      <div className="flex justify-center flex-wrap gap-2">
         {audioStreams.map((stream) => (
           <div key={stream.id}>
-            {stream.id}
+            <Avatar name={stream.id} />
             <Audio key={stream.id} stream={stream} />
           </div>
         ))}
-      </section>
+      </div>
     </div>
   );
 };
