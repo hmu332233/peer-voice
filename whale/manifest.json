@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "Peer Voice",
+  "version": "1.0.0",
+
+  "description": "웹페이지에서 친구와 간단하게 통화해보세요!",
+  "icons": {
+    "16": "telephone-call.png",
+    "48": "telephone-call.png"
+  },
+  "default_locale": "ko",
+
+  "sidebar_action": {
+    "default_icon": {
+      "16": "telephone-call.png"
+    },
+    "default_page": "index.html",
+    "default_title": "Peer Voice",
+    "use_navigation_bar": false
+  }
+}
