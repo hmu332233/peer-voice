@@ -17,9 +17,9 @@ async function startCapture() {
   return captureStream;
 }
 
-const Home: NextPage = () => {
+function Home() {
   const peer = useRef<Peer>();
-  // const [isConnected, setIsConnected] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [peerId, setPeerId] = useState('');
   const [value, setValue] = useState('');
 
@@ -38,6 +38,7 @@ const Home: NextPage = () => {
       peer.current.on('open', (id: string) => {
         console.log('open', id);
         setPeerId(id);
+        setIsInitialized(true);
       });
 
       peer.current.on('call', async (call) => {
@@ -81,13 +82,20 @@ const Home: NextPage = () => {
         <label className="label">
           <span className="label-text">내 ID</span>
         </label>
-        <input
-          type="text"
-          placeholder="Type here"
-          className="input input-bordered w-full max-w-xs"
-          value={peerId}
-          disabled
-        />
+        <div className="indicator w-full">
+          {!isInitialized && (
+            <span className="indicator-item">
+              <span className="badge badge-lg animate-bounce">Loading..</span>
+            </span>
+          )}
+          <input
+            type="text"
+            placeholder="Type here"
+            className="input input-bordered w-full max-w-xs"
+            value={peerId}
+            disabled
+          />
+        </div>
       </div>
       <div className="form-control w-full max-w-xs">
         <label className="label">
@@ -117,5 +125,6 @@ const Home: NextPage = () => {
       </div>
     </div>
   );
-};
+}
+
 export default Home;
