@@ -20,8 +20,8 @@ async function startCapture() {
 function Home() {
   const peer = useRef<Peer>();
   const [isInitialized, setIsInitialized] = useState(false);
-  const [peerId, setPeerId] = useState('');
-  const [value, setValue] = useState('');
+  const [myPeerId, setMyPeerId] = useState('');
+  const [yourPeerId, setYourPeerId] = useState('');
 
   const [audioStreams, setAudioStreams] = useState<MediaStream[]>([]);
 
@@ -37,7 +37,7 @@ function Home() {
 
       peer.current.on('open', (id: string) => {
         console.log('open', id);
-        setPeerId(id);
+        setMyPeerId(id);
         setIsInitialized(true);
       });
 
@@ -53,7 +53,7 @@ function Home() {
   }, []);
 
   const handleCopyClick = async () => {
-    await navigator.clipboard.writeText(peerId as string);
+    await navigator.clipboard.writeText(myPeerId as string);
     alert('복사되었습니다!\n친구에게 ID를 알려주세요.');
   };
 
@@ -61,17 +61,22 @@ function Home() {
     const {
       currentTarget: { value },
     } = e;
-    setValue(value);
+    setYourPeerId(value);
   };
 
-  const handleClick = async () => {
+  const handleConnectClick = async () => {
+    if (!yourPeerId) {
+      alert('친구 ID를 입력해주세요!');
+      return;
+    }
+
     const stream = await startCapture();
 
     if (!peer.current || !stream) {
       return;
     }
 
-    const call = peer.current.call(value, stream);
+    const call = peer.current.call(yourPeerId, stream);
     call.on('stream', (remoteStream) => {
       setAudioStreams((v) => [...v, remoteStream]);
     });
@@ -92,7 +97,7 @@ function Home() {
             type="text"
             placeholder="Type here"
             className="input input-bordered w-full max-w-xs"
-            value={peerId}
+            value={myPeerId}
             disabled
           />
         </div>
@@ -103,16 +108,16 @@ function Home() {
         </label>
         <input
           type="text"
-          placeholder="Type here"
+          placeholder="친구의 ID를 입력하세요."
           className="input input-bordered w-full max-w-xs"
           onChange={handleChange}
-          value={value}
+          value={yourPeerId}
         />
       </div>
       <button className="btn btn-wide" onClick={handleCopyClick}>
         내 ID 복사
       </button>
-      <button className="btn btn-wide" onClick={handleClick}>
+      <button className="btn btn-wide" onClick={handleConnectClick}>
         통화 연결하기
       </button>
       <div className="flex justify-center flex-wrap gap-2">
