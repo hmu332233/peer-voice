@@ -2,6 +2,7 @@ import type { NextPage } from 'next';
 import { useEffect, useState, useRef } from 'react';
 
 import type Peer from 'peerjs';
+import { toast } from 'react-toastify';
 
 import Audio from 'components/Audio';
 import Avatar from 'components/Avatar';
@@ -12,7 +13,15 @@ async function startCapture() {
   try {
     captureStream = await navigator.mediaDevices.getUserMedia({ audio: true });
   } catch (err) {
-    console.error('Error: ' + err);
+    if (err.name === 'NotFoundError') {
+      toast.error(
+        <div>
+          마이크(녹음 장치)가 없습니다.
+          <br />
+          마이크를 연결해주세요!
+        </div>,
+      );
+    }
   }
   return captureStream;
 }
@@ -54,7 +63,13 @@ function Home() {
 
   const handleCopyClick = async () => {
     await navigator.clipboard.writeText(myPeerId as string);
-    alert('복사되었습니다!\n친구에게 ID를 알려주세요.');
+    toast.success(
+      <div>
+        복사되었습니다!
+        <br />
+        친구에게 ID를 알려주세요.
+      </div>,
+    );
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,7 +81,7 @@ function Home() {
 
   const handleConnectClick = async () => {
     if (!yourPeerId) {
-      alert('친구 ID를 입력해주세요!');
+      toast.error('친구 ID를 입력해주세요!');
       return;
     }
 
