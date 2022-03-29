@@ -13,7 +13,7 @@ async function startCapture() {
   try {
     captureStream = await navigator.mediaDevices.getUserMedia({ audio: true });
   } catch (err) {
-    if (err.name === 'NotFoundError') {
+    if (err instanceof DOMException && err.name === 'NotFoundError') {
       toast.error(
         <div>
           마이크(녹음 장치)가 없습니다.
